@@ -21,7 +21,7 @@
 .jira-issue-key {
 }
 
-.jira-issue-key.resolved>a {
+.jira-issue.resolved>a {
   text-decoration: line-through;
 }
 
