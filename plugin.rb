@@ -20,14 +20,7 @@ class Onebox::Engine::JiraOnebox
   def to_html
     matches = @url.match(/(https?:\/\/[^\/]+)\/browse\/([A-Z][A-Z_]+-\d+)/)
 
-    puts "JIRA TO_HTML ENCOUNTERED"
-
-    puts matches[1]
-    puts matches[2]
-
     data = ::MultiJson.load(Onebox::Helpers.fetch_response(matches[1] + "/rest/api/latest/issue/" + matches[2] + '?fields=status,summary,issuetype').body)
-    
-    puts "Response " + data.to_s
 
     if not data or not data.key?('fields')
       return <<HTML
@@ -39,7 +32,6 @@ HTML
     
     html = []
 
-    puts "CHECKING STATUS"
     status = nil
     if data['fields'].key?('status')
       status = data['fields']['status']
@@ -47,7 +39,6 @@ HTML
 
     closed = status.nil? && status['name'] == 'Closed'
 
-    puts "IS CLOSED: " + closed.to_s
     html.push('<span class="jira-issue' + (closed ? ' resolved' : '') + '">')
 
     html.push('<a href="' + @url + '" class="jira-issue-key">')
