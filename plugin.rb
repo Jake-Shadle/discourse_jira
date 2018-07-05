@@ -14,10 +14,6 @@ module Onebox
     class JiraOnebox
       include Engine
 
-      Onebox.options = {
-        cache: Rails.cache
-      }
-
       # See https://confluence.atlassian.com/display/JIRA/Changing+the+Project+Key+Format for a description of the Issue Id format
       REGEX = /^(https?:\/\/[^\/]+)(?:.+)?\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+)/
       matches_regexp(/^http.+\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+).+$/)
@@ -40,26 +36,31 @@ module Onebox
           "<span class='jira-issue'><a href='#{@url}'>#{id}</a><span>"
         else
 
+          html = []
+
           closed = false
-          if data['fields'].key?('status')
-            if data['fields']['status']['name'] == 'Closed'
+          if data['fields'].key?('status') && data['fields']['status']['name'] == 'Closed'
               closed = true
-            end
           end
 
-          issueicon = ""
+          html.push("<span class='jira-issue#{(closed ? ' resolved' : ' open')}'><a href='#{@url}' class='jira-issue-key'>")
+
           if data['fields'].key?('issuetype')
             iconurl = data['fields']['issuetype']['iconUrl']
-            issueicon = "<img class='icon' src='#{iconurl}'>"
+            html.push("<img class='icon' src='#{iconurl}'>")
           end
 
-          issuesummary = ""
+          html.push("#{id}</a>")
+
           if data['fields'].key?('summary')
             summary = data['fields']['summary']
-            issuesummary = "<span class='summary'>#{summary}</span>"
+            html.push(' - ')
+            html.push("<span class='summary'>#{summary}</span>")
           end
+
+          html.push("</span>")
           
-          "<span class='jira-issue#{(closed ? ' resolved' : ' open')}'><a href='#{@url}' class='jira-issue-key'>#{issueicon} #{id}</a> - #{issuesummary}"
+          html.join('')
         end   
       end
     end
