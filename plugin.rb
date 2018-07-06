@@ -1,6 +1,6 @@
 # name: discourse_jira
 # about: Gives OneBox preview for 1 or more Jira hosts
-# version: 2.0.0
+# version: 1.0.0
 # authors: Jake Shadle
 
 Onebox = Onebox
@@ -15,6 +15,7 @@ module Onebox
       include Engine
 
       # See https://confluence.atlassian.com/display/JIRA/Changing+the+Project+Key+Format for a description of the Issue Id format
+      # Support links in the format of https://hostname.org/browse/PRODUCT-2012 or https://hostname.org/projects/PROJECT/issues/PRODUCT-2012 also supports grabbing a link that may have query string parameters.
       REGEX = /^(https?:\/\/[^\/]+)(?:.+)?\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+)/
       matches_regexp(/^http.+\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+).+$/)
 
