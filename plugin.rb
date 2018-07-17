@@ -1,7 +1,7 @@
 # name: discourse_jira
 # about: Gives OneBox preview for 1 or more Jira hosts
 # version: 1.0.0
-# authors: Jake Shadle
+# authors: Jake Shadle, Heather Boyer
 
 Onebox = Onebox
 
