@@ -1,76 +1,121 @@
 # name: discourse_jira
 # about: Gives OneBox preview for 1 or more Jira hosts
 # version: 1.0.0
-# authors: Jake Shadle
+# authors: Jake Shadle, Heather Boyer
+
+Onebox = Onebox
 
 # stylesheet
 register_asset "stylesheets/jira.css"
 register_asset "stylesheets/jira_mobile.scss", :mobile
 
-class Onebox::Engine::JiraOnebox
-  include Onebox::Engine
+module Onebox
+  module Engine
+    class JiraOnebox
+      include Engine
 
-  # See https://confluence.atlassian.com/display/JIRA/Changing+the+Project+Key+Format for a description of the Issue Id format
-  matches_regexp /^http.+\/browse\/([A-Z][A-Z_]+-\d+)$/
+      # See https://confluence.atlassian.com/display/JIRA/Changing+the+Project+Key+Format for a description of the Issue Id format
+      # Support links in the format of https://hostname.org/browse/ISSUE-ID or https://hostname.org/projects/PROJECT/issues/ISSUE-ID 
+      # Also supports grabbing a link that may have query string parameters.
+      REGEX = /^(https?:\/\/[^\/]+)(?:.+)?\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+)/
+      matches_regexp(/^http.+\/(?:issues|browse)\/([A-Z][A-Z_]+-\d+).+$/)
 
-  def id
-    @url.match(@@matcher)[1]
-  end
+      def id
+        @url.match(REGEX)[2]
+      end
 
-  def to_html
-    matches = @url.match(/(https?:\/\/[^\/]+)\/browse\/([A-Z][A-Z_]+-\d+)/)
+      def domain
+        @url.match(REGEX)[1]
+      end
 
-    data = ::MultiJson.load(Onebox::Helpers.fetch_response(matches[1] + "/rest/api/latest/issue/" + matches[2] + '?fields=status,summary,issuetype').body)
+      def to_html
 
-    if not data or not data.key?('fields')
-      return <<HTML
-<span class="jira-issue">
-  <a href="#{url}">#{id}</a>
-<span>
-HTML
+        url = domain + "/rest/api/latest/issue/" + id + '?fields=status,summary,reporter,issuetype,priority'
+        response = Onebox::Helpers.fetch_response(url) rescue "{}"
+        data = ::MultiJson.load(response)
+        
+
+        if not data or not data.key?('fields')
+          "<span class='jira-issue'><a href='#{@url}'>#{id}</a><span>"
+        else
+
+          html = []
+
+          cleanurl = @url
+          if @url.include? "?"
+            cleanurl = @url.split("?")[0]
+          end
+
+          closed = false
+          if data['fields'].key?('status') && data['fields']['status']['name'] == 'Closed'
+              closed = true
+          end
+
+          html.push("<aside class='onebox jira-issue#{(closed ? ' resolved' : ' open')}'>")
+
+          # HEADER
+          html.push("<header class='source'>")
+          html.push("<a href='#{@url}' target='_blank'>#{cleanurl}</a>")
+          html.push("</header>")
+
+          # BEGIN BODY
+          html.push("<article class='onebox-body'>")
+  
+          # USER AVATAR
+          if data['fields'].key?('reporter')
+            avatarUrl = data['fields']['reporter']['avatarUrls']['48x48']
+            displayName = data['fields']['reporter']['displayName']
+
+            html.push("<img src='#{avatarUrl}' class='thumbnail onebox-avatar' alt='#{displayName}'>")
+          end
+
+          # TITLE
+          html.push("<h4><a href='#{@url}' target='_blank' class='jira-issue-key'>#{id}</a>")
+          if data['fields'].key?('summary')
+            summary = data['fields']['summary']
+
+            html.push(" <span class='summary'>#{summary}</span>")
+          end
+          html.push("</h4>")
+
+          # DETAILS
+          html.push("<div class='date' style='margin-top:10px;'>")
+            # ISSUE TYPE
+            html.push("<div class='detail' style='margin-top:10px;'>")
+            html.push("<strong class='name'>Type: </strong>") 
+              if data['fields'].key?('issuetype')
+                issueIconUrl = data['fields']['issuetype']['iconUrl']
+                issueName = data['fields']['issuetype']['name']
+
+                html.push("<img class='icon' src='#{issueIconUrl}' width='16' height='16'>")
+                html.push(" #{issueName}")
+              end
+            html.push("</div>")
+
+            # PRIORITY TYPE
+            html.push("<div class='detail' style='margin-top:10px;'>")
+            html.push("<strong class='name'>Priority: </strong>")
+            if data['fields'].key?('priority')
+              priorityIconUrl = data['fields']['priority']['iconUrl']
+              priorityName = data['fields']['priority']['name']
+
+              html.push("<img class='icon' src='#{priorityIconUrl}' width='16' height='16'>")
+              html.push(" #{priorityName}")
+            end
+            html.push("</div>")
+          html.push("</div>")
+
+          # END BODY
+          html.push("</article>")
+  
+          html.push("<div style='clear: both'></div>")
+          html.push("</aside>")
+          
+          html.join('')
+        end   
+      end
     end
-    
-    html = []
-
-    status = nil
-    if data['fields'].key?('status')
-      status = data['fields']['status']
-    end
-
-    closed = status.nil? && status['name'] == 'Closed'
-
-    html.push('<span class="jira-issue' + (closed ? ' resolved' : '') + '">')
-
-    html.push('<a href="' + @url + '" class="jira-issue-key">')
-    
-    if data['fields'].key?('issuetype')
-      html.push('<img class="icon" src="' + data['fields']['issuetype']['iconUrl'] + '">')
-    end
-
-    html.push(matches[2])
-
-    html.push('</a>')
-    html.push(' - ')
-
-    if data['fields'].key?('summary')
-      html.push('<span class="summary">')
-
-      # Does this need sanitization?
-      html.push(data['fields']['summary'])
-      html.push('</span>')
-    end
-
-    # if status
-    #   html.push('"("')
-    #   html.push('<span class="jira-status">')
-    #   html.push('<img class="icon" src="' + data.fields.status.iconUrl + '">')
-    #   html.push('" ' + data.fields.status.name + '"')
-    #   html.push('</span>')
-    #   html.push('")"')
-    # end
-
-    html.push('</span>')
-
-    return html.join('')
-  end
+  end 
 end
+
+

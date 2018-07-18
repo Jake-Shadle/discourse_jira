@@ -3,10 +3,12 @@
 * v1.0.0 - 2015-05-14
 * (CC) This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
 * http://creativecommons.org/licenses/by-sa/4.0/
+* Owner Name: Jake Shadle
+* Original URL: https://github.com/Jake-Shadle/discourse_jira
+* Modified By: Heather Boyer
 */
 
 .jira-issue {
-  background: #f5f5f5;
   border: 1px solid #ccc;
   padding: 0 0 0 2px;
   border-radius: 3px;
@@ -18,10 +20,7 @@
   margin-right: 5px;
 }
 
-.jira-issue-key {
-}
-
-.jira-issue.resolved>a {
+aside.onebox.jira-issue.resolved .onebox-body a.jira-issue-key {
   text-decoration: line-through;
 }
 
@@ -29,4 +28,23 @@
   color: #707070;
   font-size: 12px;
   font-weight: bold;
+}
+
+aside.onebox.jira-issue .source {
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAB3RJTUUH3AgUAzIklRbzBAAAABd0RVh0U29mdHdhcmUAR0xEUE5HIHZlciAzLjRxhaThAAAACHRwTkdHTEQzAAAAAEqAKR8AAAAEZ0FNQQAAsY8L/GEFAAADcElEQVR4nO1bC3HkMAw1hEAQhIUQCIEQCAshh6AQFsJCWAgLoRAWQs+eOjc5V5IlxZ+k7ZvRTKcbfyTr78S5PgCY/tw8PT29PN39/8ZOe2mOS2T6IyX/29x7c9XhGX1gzEd6+UeG3nusiYFh/pRaEGz5vj1BT2+OPsUxJwBPC7Pe5H9/3zz7dB19x0DZctwYCqsGBMEwY6ZKPNKIXtzCCDeO8gGQEdx7TV5RJKqI0Z0YOsTwhzF/IcZMAs2hxtaBwJYfzPBwytfoPx7RbwDz/FUggLEge3lkwtlHZKoULgIBNA+fnFoGdYaSi2UEfiu5lmZTmGcOzNfwypTvCKbWNXmCKIjF/31tsJlps95Yea1f/CKqW4jpsztPoTLFhCs4x117xsLPUYURmH5LEzT36ZfMyFVvz47OKGR+azJF1SS7BSDJ+KrFfmZPWDiskyEKMj5pQnKJp3VfwxhCtxjXuTwiWxcUzRCJZIfTAnRB+L9vINk4tR/NgZBluQbZPDyhhZgnW9BsiCqkJA2VLZWpRyBf+qanB8g0XANFZLegsP04T5kSWWkG3AlKtAAda9hDEfX/t75ycdIUcqfocO3RmmH55ipkWmAKVebuBbCYPWhNECq1yEBqwxuicoMZeRYNoaCMHlVOf7MZrR2utoiFxjl5BltPrXWlbT+FRR0DkWHN0akqpiVWsysKbSxmVZyAiXko24ekAZ9VVy0hWJmvqvpfAMqkRCgEMkJkiLtTqAZLVOBU1cp81wtVdYJCbNrMfDO7Z2C12UBLHG9lvs99QAqw5Qd7icov+gBsScv3YH5FIyEck/kVlYXQJdypAfYc4fzMR1AXmT+C+RWlhHBK5lfsFcKpmV+xRwhtC5yK2COE7qluKZiF4Hq8B1gJViGc7h3itcApWfZyr90dCmmfAKvYTEJwZzAFwNvYmBBUt7xnMQWuYbogz2suTLl5jgHIXF07pHVFaEzOFKA1bxKI2uXua2ZnuWs4Ridoi9zpZ+xYe9dwOF+guj12yG0QKPsI2BzdAMqeoMOvr8QvUEQ6Tp0AuuyOTGgMgoR2XNLQqv/MzJX9quyIZqC5F3jlJlP6AuqznHZQqq0kfGkyxPYfS6UAxXt7TpbLa82gL5QCAOGcmldhRXNWAyhCl2JOjVDHetzJNit9WULjsKR+YPct0V++8RhTEFaPJQAAAABJRU5ErkJggg==') no-repeat;
+  background-size: 16px 16px;
+  padding-left: 20px;
+}
+
+aside.onebox.jira-issue .summary {
+  color: #08c;
+}
+
+aside.onebox.jira-issue .name {
+  color: #707070;
+}
+
+aside.onebox .onebox-body img.icon{
+  height: 16px;
+  width: 16px;
 }
